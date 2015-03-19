@@ -1,7 +1,7 @@
-simplepayment-php
+Payment Gateway PHP
 =================
 
-Simple Payment API REST Client
+Payment Gateway API REST Client for PHP
 
 http://paymentgateway.id
 
