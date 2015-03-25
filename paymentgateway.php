@@ -2,12 +2,12 @@
 
 class PaymentGateway
 {
-	public $production_mode 			= false;
+	public $production_mode 	= false;
 	public $access_key			= '';
 	public $secret_key			= '';
 	public $useragent 			= 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36';
-	private $initialized			= false;	
-	private $session					= null;
+	private $initialized		= false;	
+	private $session			= null;
 
 	function __construct()
 	{
@@ -85,6 +85,22 @@ class PaymentGateway
 		$data = json_decode($response, true);
 		return $data;			
 	}
+
+	public function getAccount()	
+	{
+		$url = $this->base_url().'/account';		
+		$response = $this->api_get($url);		
+		$data = json_decode($response, true);
+		return $data;		
+	}
+
+	public function getBalance()	
+	{
+		$url = $this->base_url().'/account/balance';		
+		$response = $this->api_get($url);		
+		$data = json_decode($response, true);
+		return $data;		
+	}	
 
 	public function getBillers()
 	{
