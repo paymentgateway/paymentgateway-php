@@ -1,12 +1,16 @@
 <?php
 
+namespace PaymentGateway;
+
+require_once 'exceptions.php';
+
 class PaymentGateway
 {
 	public $production_mode 	= false;
 	public $access_key			= '';
 	public $secret_key			= '';
-	public $useragent 			= 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36';
-	private $initialized		= false;	
+	public $useragent 			= 'PaymentGateway-PHP (https://github.com/sandiloka/paymentgateway-php)';
+	private $initialized		= false;
 	private $session			= null;
 
 	function __construct()
@@ -14,7 +18,7 @@ class PaymentGateway
 		if(!extension_loaded('curl'))
 		{
 			die('PaymentGateway library requires CURL. Please install PHP5 Curl extension');
-		}		
+		}
 		$this->init();
 	}
 
@@ -35,28 +39,63 @@ class PaymentGateway
 	{
 		if($this->production_mode)
 		{
-			return 'http://api.paymentgateway.id/v1';
+			return 'https://api.paymentgateway.id/v1';
 		}
 		else
 		{
-			return 'http://localhost/sandiloka/paymentgateway/api/v1';
+			return 'https://api.sandbox.paymentgateway.id/v1';
 		}
 	}
 
-	public function api_get($url)
+	public function getApiTimestamp()
 	{
-		$timestamp 	= date('YmdHisO');
+		return date('c');
+	}
+
+	public function getApiSignature($httpverb, $url, $timestamp)
+	{
 		$path 		= parse_url($url, PHP_URL_PATH);
 		$message   	= 'GET'.$path.$timestamp;
 		$digest		= hash_hmac('sha256', $message, $this->secret_key);
 		$signature	= base64_encode($digest);
+		return $signature;
+	}
+
+	public function getApiHeaders($httpverb, $url)
+	{
+		$timestamp = $this->getApiTimestamp();
 		$headers = array
 		(
 			'Accept: application/json',
 			'X-API-AccessKey: '.$this->access_key,
 			'X-API-Timestamp: '.$timestamp,
-			'Authorization: '.'hmac '.$signature
+			'Authorization: '.$this->getApiSignature('GET', $url, $timestamp),
+			'Connection: close'
 		);
+
+		return $headers;
+	}
+
+	public function parseResponse($response)
+	{
+		$json = json_decode($response, true);
+		if($json == null)
+		{
+			throw new InvalidResponseException("Response is not valid json: ".$response, 1);
+		}
+		else
+		{
+			if(array_key_exists('error', $json))
+			{
+				throw new InvalidRequestException($json['error_msg'], $json['error_code']);
+			}
+		}
+		return $json;
+	}
+
+	public function api_get($url)
+	{
+		$headers = $this->getApiHeaders('GET', $url);
 		curl_setopt( $this->session, CURLOPT_HTTPHEADER, $headers );
 		curl_setopt( $this->session, CURLOPT_URL, $url );
 		curl_setopt( $this->session, CURLOPT_HTTPGET, 1);
@@ -66,6 +105,8 @@ class PaymentGateway
 
 	public function api_post($url, $params)
 	{
+		$headers = $this->getApiHeaders('POST', $url);
+		curl_setopt( $this->session, CURLOPT_HTTPHEADER, $headers );
 		curl_setopt( $this->session, CURLOPT_FOLLOWLOCATION, 0 );
 		curl_setopt( $this->session, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt( $this->session, CURLOPT_URL, $url );
@@ -78,33 +119,33 @@ class PaymentGateway
 		return $output;
 	}
 
-	public function test()
+	public function auth()
 	{
 		$url = $this->base_url().'/';
 		$response = $this->api_get($url);
-		$data = json_decode($response, true);
-		return $data;			
+		$data = $this->parseResponse($response);
+		return $data;
 	}
 
-	public function getAccount()	
+	public function getAccount()
 	{
-		$url = $this->base_url().'/account';		
-		$response = $this->api_get($url);		
-		$data = json_decode($response, true);
-		return $data;		
+		$url = $this->base_url().'/account';
+		$response = $this->api_get($url);
+		$data = $this->parseResponse($response);
+		return $data;
 	}
 
-	public function getBalance()	
+	public function getBalance()
 	{
-		$url = $this->base_url().'/account/balance';		
-		$response = $this->api_get($url);		
-		$data = json_decode($response, true);
-		return $data;		
-	}	
+		$url = $this->base_url().'/account/balance';
+		$response = $this->api_get($url);
+		$data = $this->parseResponse($response);
+		return $data;
+	}
 
 	public function getBillers()
 	{
-		$url = $this->base_url().'/billers';		
+		$url = $this->base_url().'/billers';
 		$response = $this->api_get($url);
 		$billers = json_decode($response, true);
 		return $billers;
@@ -112,15 +153,15 @@ class PaymentGateway
 
 	public function getBiller($billerid)
 	{
-		$url = $this->base_url().'/billers/'.$billerid;		
+		$url = $this->base_url().'/billers/'.$billerid;
 		$response = $this->api_get($url);
-		$data = json_decode($response, true);
-		return $data;		
+		$data = $this->parseResponse($response);
+		return $data;
 	}
 
 	public function getProducts()
 	{
-		$url = $this->base_url().'/products';		
+		$url = $this->base_url().'/products';
 		$response = $this->api_get($url);
 		$billers = json_decode($response, true);
 		return $billers;
@@ -128,25 +169,23 @@ class PaymentGateway
 
 	public function getProduct($productid)
 	{
-		$url = $this->base_url().'/products/'.$productid;		
+		$url = $this->base_url().'/products/'.$productid;
 		$response = $this->api_get($url);
-		$data = json_decode($response, true);
-		return $data;		
+		$data = $this->parseResponse($response);
+		return $data;
 	}
 
-	public function inquiry($billerid, $productid, $customerid, $invoiceid)
+	public function inquiry($productid, $customerid)
 	{
 
 	}
 
-	public function payment($billerid, $productid, $customerid, $invoiceid)
+	public function payment($productid, $customerid, $refid)
 	{
-
-	}
-
-	public function topup($billerid, $productid, $customerid, $amount)
-	{
-
+		$url = $this->base_url().'/payments';
+		$response = $this->api_post($url);
+		$data = $this->parseResponse($response);
+		return $data;
 	}
 
 
