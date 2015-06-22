@@ -15,6 +15,21 @@ This is official payment gateway client library for PHP using Sandiloka Payment 
   $gateway->access_key = 'your_access_key';
   $gateway->secret_key = 'your_secret_key';
 ```
+
+## Get Account 
+
+```php
+  $account = $gateway->getAccount();
+  print_r($account)
+``` 
+
+## Get Balance 
+
+```php
+  $balance = $gateway->getBalance();
+  echo $balance;
+``` 
+
 ## Get Billers
 
 ```php
@@ -26,4 +41,14 @@ This is official payment gateway client library for PHP using Sandiloka Payment 
   $biller = $gateway->getBiller('pln');
   print_r($biller);
 ```
+## Get Products
 
+```php
+  $products = $gateway->getProducts();
+  print_r($products)
+``` 
+## Get Product Data
+```php
+  $product = $gateway->getProduct('pln-1600');
+  print_r($product);
+```
