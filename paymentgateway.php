@@ -1,6 +1,6 @@
 <?php
 
-namespace PaymentGateway;
+namespace Sandiloka;
 
 require_once 'exceptions.php';
 
