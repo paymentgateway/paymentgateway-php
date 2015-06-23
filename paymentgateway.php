@@ -30,6 +30,7 @@ class PaymentGateway
         curl_setopt( $this->session, CURLOPT_USERAGENT, $this->useragent);
         curl_setopt( $this->session, CURLOPT_SSL_VERIFYHOST, 2 );
         curl_setopt( $this->session, CURLOPT_SSL_VERIFYPEER, true );
+        curl_setopt( $this->session, CURLOPT_CAINFO, dirname(__FILE__).'/cert/ca-bundle.crt');
         curl_setopt( $this->session, CURLOPT_FOLLOWLOCATION, 0 );
         curl_setopt( $this->session, CURLOPT_RETURNTRANSFER, 1 );
         $this->initialized = TRUE;
