@@ -2,9 +2,9 @@
 
 require '../paymentgateway.php';
 
-$pg = new PaymentGateway();
-$pg->secret_key = 'sandiloka-test';
-$pg->access_key = 'accesskey-test';
+$pg = new Sandiloka\PaymentGateway();
+$pg->access_key = 'your_access_key';
+$pg->secret_key = 'your_secret_key';
 
 $result = $pg->getAccount();
 
