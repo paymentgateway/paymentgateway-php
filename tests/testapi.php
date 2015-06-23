@@ -10,8 +10,8 @@ class TestAPI extends PHPUnit_Framework_TestCase
 	protected function setUp()
 	{
 		$this->api = new \Sandiloka\PaymentGateway();
-		$this->api->access_key = 'NzE0NDI2MjI1';
-		$this->api->secret_key = 'ea583048c34897f6e55bac1cf9d9ad867acdca09';
+		$this->api->access_key = 'NzY5NTgwODIy';
+		$this->api->secret_key = '9fee9c52c62256255002e6aa066bb345713b19d2';
 		$this->api->production_mode = false;
 	}
 
@@ -26,13 +26,19 @@ class TestAPI extends PHPUnit_Framework_TestCase
 		$this->assertEquals('https://api.paymentgateway.id/v1', $this->api->base_url());
 
 		$this->api->production_mode = false;
-		$this->assertEquals('https://api.sandbox.paymentgateway.id/v1', $this->api->base_url());
+		$this->assertEquals('https://api-sandbox.paymentgateway.id/v1', $this->api->base_url());
+	}
+
+	public function testTimestamp()
+	{
+		$timestamp = $this->api->getApiTimestamp();
 	}
 
 	public function testApiHeaders()
 	{
 		$this->api->production_mode = false;
 		$headers = $this->api->getApiHeaders('GET', '/');
+		print_r($headers);
 		$this->assertCount(5, $headers, 'getApiHeaders failed');
 	}
 
@@ -41,7 +47,7 @@ class TestAPI extends PHPUnit_Framework_TestCase
      */
 	public function testInvalidResponse()
 	{
-		$this->api->parseResponse('');
+		$this->api->parseResponse('{a: 0}');
 	}
 
     /**
@@ -49,9 +55,7 @@ class TestAPI extends PHPUnit_Framework_TestCase
      */
 	public function testInvalidRequest()
 	{
-		$this->api->access_key = '';
-		$this->api->secret_key = '';
-		$result = $this->api->auth();
+		$this->api->parseResponse('{"error": true, "error_code": 1, "error_msg": "test"}');
 	}
 
 	public function testApiGet()
