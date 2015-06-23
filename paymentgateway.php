@@ -28,8 +28,8 @@ class PaymentGateway
         curl_setopt( $this->session, CURLOPT_COOKIEJAR, 'cookiejar' );
         curl_setopt( $this->session, CURLOPT_COOKIEFILE, 'cookiejar' );
         curl_setopt( $this->session, CURLOPT_USERAGENT, $this->useragent);
-        curl_setopt( $this->session, CURLOPT_SSL_VERIFYHOST, 0 );
-        curl_setopt( $this->session, CURLOPT_SSL_VERIFYPEER, 0 );
+        curl_setopt( $this->session, CURLOPT_SSL_VERIFYHOST, 2 );
+        curl_setopt( $this->session, CURLOPT_SSL_VERIFYPEER, true );
         curl_setopt( $this->session, CURLOPT_FOLLOWLOCATION, 0 );
         curl_setopt( $this->session, CURLOPT_RETURNTRANSFER, 1 );
         $this->initialized = TRUE;
@@ -43,7 +43,7 @@ class PaymentGateway
         }
         else
         {
-            return 'https://api.sandbox.paymentgateway.id/v1';
+            return 'https://api-sandbox.paymentgateway.id/v1';
         }
     }
 
@@ -78,12 +78,12 @@ class PaymentGateway
 
     public function parseResponse($response)
     {
-        $json = json_decode($response, true);
-        if($json == null)
+        $json = json_decode($response, true);        
+        if(json_last_error() != JSON_ERROR_NONE)
         {
-            throw new InvalidResponseException("Response is not a valid json: ".$response, 1);
+            throw new InvalidResponseException(json_last_error_msg(), json_last_error());
         }
-        else
+        elseif($json != null)
         {
             if(array_key_exists('error', $json))
             {
