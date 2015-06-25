@@ -1,6 +1,6 @@
 <?php
 
-require_once '../paymentgateway.php';
+require_once 'paymentgateway.php';
 
 class TestAPI extends PHPUnit_Framework_TestCase
 {
@@ -57,6 +57,16 @@ class TestAPI extends PHPUnit_Framework_TestCase
 	{
 		$this->api->parseResponse('{"error": true, "error_code": 1, "error_msg": "test"}');
 	}
+
+    /**
+     * @expectedException Sandiloka\InvalidRequestException
+     */
+	public function testInvalidAccessKey()
+	{
+		$this->api->access_key = '';
+		$this->api->secret_key = '';		
+		$this->api->getBalance();
+	}	
 
 	public function testApiGet()
 	{
