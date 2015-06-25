@@ -1,4 +1,4 @@
-<phpunit bootstrap="src/autoload.php">
+<phpunit>
   <testsuites>
     <testsuite name="API">
       <file>tests/testapi.php</file>
