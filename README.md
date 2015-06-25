@@ -1,7 +1,7 @@
 Payment Gateway PHP
 =================
-[![Build Status](https://travis-ci.org/sandiloka/paymentgateway-php.svg?branch=master)](https://travis-ci.org/sandiloka/paymentgateway-php)
-Payment Gateway API REST Client for PHP
+
+Payment Gateway API REST Client for PHP. [![Build Status](https://travis-ci.org/sandiloka/paymentgateway-php.svg?branch=master)](https://travis-ci.org/sandiloka/paymentgateway-php)
 
 https://docs.paymentgateway.id/api/
 
