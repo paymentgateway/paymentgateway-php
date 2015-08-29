@@ -132,6 +132,8 @@ class PaymentGateway
     {
         $url = $this->base_url().'/account';
         $response = $this->api_get($url);
+        print "getAccount: \r\n";
+        print $response."\r\n";
         $data = $this->parseResponse($response);
         return $data;
     }
