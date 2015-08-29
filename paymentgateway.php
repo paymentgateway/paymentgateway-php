@@ -17,7 +17,7 @@ class PaymentGateway
     {
         if(!extension_loaded('curl'))
         {
-            die('PaymentGateway library requires CURL. Please install PHP5 Curl extension');
+            throw new Exception("PaymentGateway library requires CURL. Please install PHP5 Curl extension", 1);            
         }
         $this->init();
     }
