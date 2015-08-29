@@ -37,8 +37,7 @@ class ApiTest extends PHPUnit_Framework_TestCase
 	public function testApiHeaders()
 	{
 		$this->api->production_mode = false;
-		$headers = $this->api->getApiHeaders('GET', '/');
-		print_r($headers);
+		$headers = $this->api->getApiHeaders('GET', '/');		
 		$this->assertCount(5, $headers, 'getApiHeaders failed');
 	}
 
@@ -70,7 +69,8 @@ class ApiTest extends PHPUnit_Framework_TestCase
 
 	public function testApiGet()
 	{
-		$data = $this->api->parseResponse( $this->api->api_get($this->api->base_url().'/') );
+		$json = $this->api->api_get($this->api->base_url().'/');		
+		$data = $this->api->parseResponse($json);		
 		$this->assertArrayHasKey('message', $data, '$paymentgateway->auth() gagal');
 	}
 
